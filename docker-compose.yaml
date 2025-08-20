@@ -1,0 +1,29 @@
+services:
+  next-app:
+    build:
+      context: ./reeltest
+      dockerfile: Dockerfile
+    container_name: next-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./reeltest:/usr/src/app
+      #- ./reeltest/node_modules:/usr/src/app/node_modules
+      - ./uploads:/usr/src/app/uploads
+      - ./outputs:/usr/src/app/outputs
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - ffmpeg-server
+
+
+  ffmpeg-server:
+    build:
+      context: ./ffmpeg-server
+      dockerfile: Dockerfile
+    container_name: ffmpeg-server
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./uploads:/uploads
+      - ./outputs:/outputs
