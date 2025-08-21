@@ -3,7 +3,7 @@
 # dependencies
 /node_modules
 /ffmpeg-server/node_modules
-/realtest/node_modules
+/reeltest/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -16,9 +16,8 @@
 /coverage
 
 # next.js
-/.next/
-/out/
-
+/reeltest/.next/
+/reeltest/out/
 
 # production
 /build
