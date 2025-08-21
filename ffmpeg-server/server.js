@@ -5,6 +5,7 @@ const path = require("path");
 
 const app = express();
 const PORT = 5001;
+const VERSION = "v1.3.0";
 
 const upload = multer({ dest: "/uploads/" });
 
@@ -20,7 +21,7 @@ app.post("/convert", upload.array("images"), (req, res) => {
 
   const outputFile = "/outputs/out.mp4";
 
-  const cmd = `ffmpeg -y -f concat -safe 0 -i ${inputListPath} -s 1280x720 -c:v libx264 -crf 18 -pix_fmt yuv420p -movflags +faststart ${outputFile}`;
+  const cmd = `ffmpeg -y -f concat -safe 0 -i ${inputListPath} -vf "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2" -c:v libx264 -crf 18 -pix_fmt yuv420p -movflags +faststart ${outputFile}`;
   console.log("FFmpeg command:", cmd);
 
   exec(cmd, (err, stdout, stderr) => {
@@ -28,11 +29,18 @@ app.post("/convert", upload.array("images"), (req, res) => {
       console.error(stderr);
       return res.status(500).json({ error: "FFmpeg 変換失敗" });
     }
+    req.files.forEach(file => {
+    try {
+        fs.unlinkSync(file.path);
+      } catch (unlinkErr) {
+        console.error("Failed to delete file:", file.path, unlinkErr);
+      }
+    });
 
     res.json({ output: outputFile });
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`FFmpeg server(v1.1) running on port ${PORT}`);
+  console.log(`FFmpeg server(${VERSION}) running on port ${PORT}`);
 });
