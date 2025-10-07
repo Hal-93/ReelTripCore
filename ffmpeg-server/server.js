@@ -16,8 +16,20 @@ app.post("/convert", upload.array("images"), (req, res) => {
 
   const inputListPath = "/uploads/input.txt";
   const fs = require("fs");
-  const fileListContent = req.files.map(file => `file '${file.path}'`).join('\n');
+  const fileListContent = req.files
+   .map((file, index) => {
+     let entry = `file '${file.path}'\n`;
+     entry += `duration 1\n`; // 1秒ずつ表示
+     // 最後のファイルだけもう一度追加（FFmpegの仕様対策）
+     if (index === req.files.length - 1) {
+       entry += `file '${file.path}'\n`;
+     }
+     return entry;
+   })
+   .join('');
+
   fs.writeFileSync(inputListPath, fileListContent);
+
 
   const outputFile = "/outputs/out.mp4";
 
